@@ -1,0 +1,54 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# Virtual environments
+env/
+venv/
+.env
+.env.production
+
+# Database files
+data/postgres_data
+
+# Logs
+*.log
+
+# Django specific
+*.sqlite3
+db.sqlite3
+*.sql
+migrations/
+!.gitignore
+
+# Static and media files (managed by collectstatic)
+staticfiles/
+media/
+
+# macOS system files
+.DS_Store
+
+# IDE and editor files
+.idea/
+*.sublime-workspace
+*.sublime-project
+.vscode/
+
+# Backup files
+*~
+
+# Temporary files
+*.tmp
+*.bak
+
+# Local settings
+local_settings.py
+
+# Uploaded files during development
+uploads/
+
+# Hypothesis testing files
+.hypothesis/

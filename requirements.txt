@@ -1,0 +1,12 @@
+django>=4.2
+djangorestframework>=3.14
+django-filter>=23.2
+django-cors-headers
+django-ckeditor
+psycopg2-binary>=2.9
+python-decouple
+cloudinary
+Pillow>=10.0.0
+whitenoise>=6.5.0
+dj-database-url>=2.1.0
+debugpy>=1.8.0 # Local or remote debugging
