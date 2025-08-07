@@ -4,26 +4,23 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from configs.paginations import CustomPagination
 from configs.variable_response import response_data
+from utils.query_cache_mixin import CacheQuerysetMixin, ListRequestMixin
 from .models import Blogs, Experiences, Projects
 from .serializers import BlogsSerializer, ExperiencesSerializer, ProjectsSerializer
 from .filters import BlogsFilter, ExperiencesFilter, ProjectsFilter
 from django.utils.translation import gettext_lazy as _
 
-class BlogsListView(generics.GenericAPIView):
+class BlogsListView(CacheQuerysetMixin, generics.GenericAPIView):
     queryset = Blogs.objects.all().order_by('id')
     serializer_class = BlogsSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = BlogsFilter
     pagination_class = CustomPagination
     page_size = 10
+    cache_timeout = 600 # 10 minutes for blogs
 
     def get(self, request, *args, **kwargs):
-        print("Tìm kiếm blog")
-        queryset = self.filter_queryset(self.get_queryset())
-        paginator = self.pagination_class()
-        result = paginator.get_paginated_data(queryset, self.serializer_class, request)
-        print(f"Tìm kiếm blog, tổng số: [{result['paging']['total_rows']}]")
-        return response_data(data=result)
+        return self.handle_list_request(request)
 
 class BlogsDetailView(generics.GenericAPIView):
     queryset = Blogs.objects.all().order_by('id')
@@ -44,21 +41,17 @@ class BlogsDetailView(generics.GenericAPIView):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-class ExperiencesListView(generics.GenericAPIView):
+class ExperiencesListView(CacheQuerysetMixin, generics.GenericAPIView):
     queryset = Experiences.objects.all().order_by('id')
     serializer_class = ExperiencesSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = ExperiencesFilter
     pagination_class = CustomPagination
     page_size = 10
-
+    cache_timeout = 900 # 15 minutes for experiences
+    
     def get(self, request, *args, **kwargs):
-        print("Tìm kiếm experience")
-        queryset = self.filter_queryset(self.get_queryset())
-        paginator = self.pagination_class()
-        result = paginator.get_paginated_data(queryset, self.serializer_class, request)
-        print(f"Tìm kiếm experience, tổng số: [{result['paging']['total_rows']}]")
-        return response_data(data=result)
+        return self.handle_list_request(request)
 
 class ExperiencesDetailView(generics.GenericAPIView):
     queryset = Experiences.objects.all().order_by('id')
@@ -79,7 +72,7 @@ class ExperiencesDetailView(generics.GenericAPIView):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-class ProjectsListView(generics.GenericAPIView):
+class ProjectsListView(CacheQuerysetMixin, generics.GenericAPIView):
     queryset = Projects.objects.all().order_by('id')
     serializer_class = ProjectsSerializer
     filter_backends = [DjangoFilterBackend]
@@ -88,12 +81,7 @@ class ProjectsListView(generics.GenericAPIView):
     page_size = 5
 
     def get(self, request, *args, **kwargs):
-        print("Tìm kiếm project")
-        queryset = self.filter_queryset(self.get_queryset())
-        paginator = self.pagination_class()
-        result = paginator.get_paginated_data(queryset, self.serializer_class, request)
-        print(f"Tìm kiếm project, tổng số: [{result['paging']['total_rows']}]")
-        return response_data(data=result)
+        return self.handle_list_request(request)
 
 class ProjectsDetailView(generics.GenericAPIView):
     queryset = Projects.objects.all().order_by('id')

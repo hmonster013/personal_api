@@ -6,6 +6,7 @@ from configs import variable_systems
 from configs.paginations import CustomPagination
 from configs.variable_response import response_data
 from utils import utils
+from utils.query_cache_mixin import ListRequestMixin
 from .models import Skills, Links, Contact
 from .serializers import SkillsSerializer, LinksSerializer, ContactCreateSerializer
 from .filters import SkillsFilter, LinksFilter
@@ -21,7 +22,7 @@ def get_all_config(request):
         helper.print_log_error(func_name="get_all_config", error=ex)
         return response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data=None)
 
-class SkillsListView(generics.GenericAPIView):
+class SkillsListView(ListRequestMixin, generics.GenericAPIView):
     queryset = Skills.objects.all().order_by('id')
     serializer_class = SkillsSerializer
     filter_backends = [DjangoFilterBackend]
@@ -30,14 +31,9 @@ class SkillsListView(generics.GenericAPIView):
     page_size = 10 
 
     def get(self, request, *args, **kwargs):
-        print("Tìm kiếm skill")
-        queryset = self.filter_queryset(self.get_queryset())
-        paginator = self.pagination_class()
-        result = paginator.get_paginated_data(queryset, self.serializer_class, request)
-        print(f"Tìm kiếm skill, tổng số: [{result['paging']['total_rows']}]")
-        return response_data(data=result)
+        return self.handle_list_request(request)
 
-class LinksListView(generics.GenericAPIView):
+class LinksListView(ListRequestMixin, generics.GenericAPIView):
     queryset = Links.objects.all().order_by('id')
     serializer_class = LinksSerializer
     filter_backends = [DjangoFilterBackend]
@@ -46,12 +42,7 @@ class LinksListView(generics.GenericAPIView):
     page_size = 1
 
     def get(self, request, *args, **kwargs):
-        print("Tìm kiếm link")
-        queryset = self.filter_queryset(self.get_queryset())
-        paginator = self.pagination_class()
-        result = paginator.get_paginated_data(queryset, self.serializer_class, request)
-        print(f"Tìm kiếm link, tổng số: [{result['paging']['total_rows']}]")
-        return response_data(data=result)
+        return self.handle_list_request(request)
 
 class LinksDetailView(generics.GenericAPIView):
     queryset = Links.objects.all().order_by('id')

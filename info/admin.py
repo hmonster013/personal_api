@@ -5,7 +5,7 @@ from django.conf import settings
 from ckeditor.widgets import CKEditorWidget
 
 from common.models import File
-from helpers.cloudinary_service import CloudinaryService
+from utils.cloudinary_service import CloudinaryService
 from .models import Blogs, Experiences, ProjectImage, Projects
 from django.db import models
 

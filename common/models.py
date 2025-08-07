@@ -1,7 +1,7 @@
 from django.db import models
 from ckeditor.fields import RichTextField
 
-from helpers.cloudinary_service import CloudinaryService
+from utils.cloudinary_service import CloudinaryService
 
 class CommonBaseModel(models.Model):
     class Meta:
