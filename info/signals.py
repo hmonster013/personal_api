@@ -2,7 +2,7 @@ from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 
 from info.models import Blogs, Projects
-from utils.versioned_cache import VersionedCacheManager
+from utils.cache.managers.versioned_cache import VersionedCacheManager
 
 @receiver([post_save, post_delete], sender=Blogs)
 def invalidate_blogs_cache(sender, instance, created=None, **kwargs):

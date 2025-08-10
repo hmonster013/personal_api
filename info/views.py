@@ -4,8 +4,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from configs.paginations import CustomPagination
 from configs.variable_response import response_data
-from utils.query_cache_mixin import QueryCacheMixin, ListRequestMixin
-from utils.response_cache_mixin import ResponseCacheMixin
+from utils.cache.mixins.query_cache_mixin import QueryCacheMixin
+from utils.cache.mixins.response_cache_mixin import ResponseCacheMixin
 from .models import Blogs, Experiences, Projects
 from .serializers import BlogsSerializer, ExperiencesSerializer, ProjectsSerializer
 from .filters import BlogsFilter, ExperiencesFilter, ProjectsFilter

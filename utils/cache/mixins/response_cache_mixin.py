@@ -1,7 +1,6 @@
-from django.core.cache import cache
 from rest_framework.response import Response
-from .response_cache import ResponseCacheManager
-from .versioned_cache import VersionedCacheManager
+from utils.cache.managers.response_cache import ResponseCacheManager
+from utils.cache.managers.versioned_cache import VersionedCacheManager
 
 
 class ResponseCacheMixin:

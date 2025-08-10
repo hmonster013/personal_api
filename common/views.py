@@ -1,13 +1,11 @@
 # common/views.py
 from rest_framework import generics, status
-from rest_framework.decorators import api_view
 from django_filters.rest_framework import DjangoFilterBackend
 from configs import variable_systems
 from configs.paginations import CustomPagination
 from configs.variable_response import response_data
-from utils import utils
-from utils.query_cache_mixin import ListRequestMixin, QueryCacheMixin
-from utils.response_cache_mixin import ResponseCacheMixin
+from utils.cache.mixins.query_cache_mixin import QueryCacheMixin
+from utils.cache.mixins.response_cache_mixin import ResponseCacheMixin
 from .models import Skills, Links, Contact
 from .serializers import SkillsSerializer, LinksSerializer, ContactCreateSerializer
 from .filters import SkillsFilter, LinksFilter

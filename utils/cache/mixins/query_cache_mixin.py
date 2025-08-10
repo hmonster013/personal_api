@@ -1,6 +1,6 @@
 from configs.variable_response import response_data
-from .query_cache import QueryCacheManager
-from .versioned_cache import VersionedCacheManager
+from utils.cache.managers.query_cache import QueryCacheManager
+from utils.cache.managers.versioned_cache import VersionedCacheManager
 
 class ListRequestMixin:
     """

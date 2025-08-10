@@ -2,7 +2,7 @@ import hashlib
 import json
 from django.core.cache import cache
 from datetime import datetime
-from .versioned_cache import VersionedCacheManager
+from utils.cache.managers.versioned_cache import VersionedCacheManager
 
 
 class ResponseCacheManager:

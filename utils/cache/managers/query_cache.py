@@ -1,6 +1,6 @@
 from django.core.cache import cache
 from django.db.models import QuerySet
-from .versioned_cache import VersionedCacheManager
+from utils.cache.managers.versioned_cache import VersionedCacheManager
 import hashlib
 import json
 
