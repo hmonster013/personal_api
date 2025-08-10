@@ -59,7 +59,7 @@ class CloudinaryService:
     @staticmethod
     def get_url_from_public_id(public_id: str, options_config: dict = {}) -> Tuple[Optional[str], Optional[dict]]:
         """
-        Get URL from public ID with caching
+        Get URL from public ID with caching.
         
         Args:
             public_id: Public ID
