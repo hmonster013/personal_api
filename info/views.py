@@ -4,13 +4,14 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from configs.paginations import CustomPagination
 from configs.variable_response import response_data
-from utils.query_cache_mixin import CacheQuerysetMixin, ListRequestMixin
+from utils.query_cache_mixin import QueryCacheMixin, ListRequestMixin
+from utils.response_cache_mixin import ResponseCacheMixin
 from .models import Blogs, Experiences, Projects
 from .serializers import BlogsSerializer, ExperiencesSerializer, ProjectsSerializer
 from .filters import BlogsFilter, ExperiencesFilter, ProjectsFilter
 from django.utils.translation import gettext_lazy as _
 
-class BlogsListView(CacheQuerysetMixin, generics.GenericAPIView):
+class BlogsListView(ResponseCacheMixin, QueryCacheMixin, generics.GenericAPIView):
     queryset = Blogs.objects.all().order_by('id')
     serializer_class = BlogsSerializer
     filter_backends = [DjangoFilterBackend]
@@ -18,13 +19,15 @@ class BlogsListView(CacheQuerysetMixin, generics.GenericAPIView):
     pagination_class = CustomPagination
     page_size = 10
     cache_timeout = 600 # 10 minutes for blogs
+    response_cache_timeout = 300 # 10 minutes for blogs
 
     def get(self, request, *args, **kwargs):
         return self.handle_list_request(request)
 
-class BlogsDetailView(generics.GenericAPIView):
+class BlogsDetailView(ResponseCacheMixin, generics.GenericAPIView):
     queryset = Blogs.objects.all().order_by('id')
     serializer_class = BlogsSerializer
+    response_cache_timeout = 600  # 10 minutes for blog details
 
     def get(self, request, id, *args, **kwargs):
         print(f"Lấy chi tiết blog [{id}]")
@@ -41,7 +44,7 @@ class BlogsDetailView(generics.GenericAPIView):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-class ExperiencesListView(CacheQuerysetMixin, generics.GenericAPIView):
+class ExperiencesListView(ResponseCacheMixin, QueryCacheMixin, generics.GenericAPIView):
     queryset = Experiences.objects.all().order_by('id')
     serializer_class = ExperiencesSerializer
     filter_backends = [DjangoFilterBackend]
@@ -49,13 +52,15 @@ class ExperiencesListView(CacheQuerysetMixin, generics.GenericAPIView):
     pagination_class = CustomPagination
     page_size = 10
     cache_timeout = 900 # 15 minutes for experiences
+    response_cache_timeout = 900  # 15 minutes for experiences
     
     def get(self, request, *args, **kwargs):
         return self.handle_list_request(request)
 
-class ExperiencesDetailView(generics.GenericAPIView):
+class ExperiencesDetailView(ResponseCacheMixin, generics.GenericAPIView):
     queryset = Experiences.objects.all().order_by('id')
     serializer_class = ExperiencesSerializer
+    response_cache_timeout = 900  # 15 minutes for experience details
 
     def get(self, request, id, *args, **kwargs):
         print(f"Lấy chi tiết experience [{id}]")
@@ -72,20 +77,22 @@ class ExperiencesDetailView(generics.GenericAPIView):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-class ProjectsListView(CacheQuerysetMixin, generics.GenericAPIView):
+class ProjectsListView(ResponseCacheMixin, QueryCacheMixin, generics.GenericAPIView):
     queryset = Projects.objects.all().order_by('id')
     serializer_class = ProjectsSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = ProjectsFilter
     pagination_class = CustomPagination
     page_size = 5
+    response_cache_timeout = 600  # 10 minutes for projects
 
     def get(self, request, *args, **kwargs):
         return self.handle_list_request(request)
 
-class ProjectsDetailView(generics.GenericAPIView):
+class ProjectsDetailView(ResponseCacheMixin, generics.GenericAPIView):
     queryset = Projects.objects.all().order_by('id')
     serializer_class = ProjectsSerializer
+    response_cache_timeout = 600  # 10 minutes for project details
 
     def get(self, request, id, *args, **kwargs):
         print(f"Lấy chi tiết project [{id}]")

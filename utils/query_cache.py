@@ -1,20 +1,22 @@
 from django.core.cache import cache
 from django.db.models import QuerySet
+from .versioned_cache import VersionedCacheManager
 import hashlib
 import json
 
 class QueryCacheManager:
     @staticmethod
     def get_cache_key(model_name, filters=None, ordering=None):
-        """Generate cache key for queryset
-
+        """
+        Generate base cache key for queryset (without version)
+        
         Args:
             model_name (str): Name of the model
-            filters (dict, optional): Filters applied to the queryset. Defaults to None.
-            ordering (list, optional): Ordering applied to the queryset. Defaults to None.
-
+            filters (dict): Query filters
+            ordering (list): Ordering fields
+            
         Returns:
-            str: Cache key
+            str: Base cache key
         """
         key_data = {
             "model": model_name,
@@ -25,14 +27,77 @@ class QueryCacheManager:
         return f"query_{hashlib.md5(key_string.encode()).hexdigest()}"
     
     @staticmethod
+    def get_versioned_cache_key(model_name, filters=None, ordering=None):
+        """
+        Generate versioned cache key for queryset
+        
+        Args:
+            model_name (str): Name of the model
+            filters (dict): Query filters
+            ordering (list): Ordering fields
+            
+        Returns:
+            str: Versioned cache key
+        """
+        base_key = QueryCacheManager.get_cache_key(model_name, filters, ordering)
+        return VersionedCacheManager.get_versioned_key(base_key, model_name)
+    
+    @staticmethod
+    def cache_versioned_queryset(model_name, queryset, filters=None, ordering=None, timeout=300):
+        """
+        Cache queryset with versioning support
+        
+        Args:
+            model_name (str): Name of the model
+            queryset (QuerySet): Django queryset to cache
+            filters (dict): Query filters used
+            ordering (list): Ordering fields used
+            timeout (int): Cache timeout in seconds
+            
+        Returns:
+            list: Cached data as list of dictionaries
+        """
+        base_key = QueryCacheManager.get_cache_key(model_name, filters, ordering)
+        data = list(queryset.values())
+        
+        # Store with versioned key
+        VersionedCacheManager.set_versioned_data(
+            base_key=base_key,
+            model_name=model_name,
+            data=data,
+            timeout=timeout
+        )
+        return data
+    
+    @staticmethod
+    def get_versioned_cached_queryset(model_name, filters=None, ordering=None):
+        """
+        Get versioned cached queryset
+        
+        Args:
+            model_name (str): Name of the model
+            filters (dict): Query filters
+            ordering (list): Ordering fields
+            
+        Returns:
+            list|None: Cached data or None if not found
+        """
+        base_key = QueryCacheManager.get_cache_key(model_name, filters, ordering)
+        return VersionedCacheManager.get_versioned_data(base_key, model_name)
+    
+    # ================================
+    # Legacy methods for backward compatibility
+    # ================================
+    @staticmethod
     def cache_queryset(cache_key, queryset, timeout=300):
-        """Cache queryset
-
+        """
+        Legacy method - use cache_versioned_queryset instead
+        
         Args:
             cache_key (str): Cache key
-            queryset (QuerySet): Queryset to cache
-            timeout (int, optional): Timeout in seconds. Defaults to 300.
-
+            queryset (QuerySet): Django queryset
+            timeout (int): Cache timeout
+            
         Returns:
             list: Cached data
         """
@@ -42,21 +107,13 @@ class QueryCacheManager:
     
     @staticmethod
     def get_cached_queryset(cache_key):
-        """Get cached queryset
-
+        """
+        Legacy method - use get_versioned_cached_queryset instead
+        
         Args:
             cache_key (str): Cache key
-
+            
         Returns:
-            list: Cached data
+            list|None: Cached data or None
         """
         return cache.get(cache_key)
-    
-    @staticmethod
-    def invalidate_model_cache(model_name):
-        """Invalidate cache for a model
-
-        Args:
-            model_name (str): Name of the model
-        """
-        cache.delete_many(cache.keys(f"*query_*{model_name}_*"))

@@ -6,47 +6,53 @@ from configs import variable_systems
 from configs.paginations import CustomPagination
 from configs.variable_response import response_data
 from utils import utils
-from utils.query_cache_mixin import ListRequestMixin
+from utils.query_cache_mixin import ListRequestMixin, QueryCacheMixin
+from utils.response_cache_mixin import ResponseCacheMixin
 from .models import Skills, Links, Contact
 from .serializers import SkillsSerializer, LinksSerializer, ContactCreateSerializer
 from .filters import SkillsFilter, LinksFilter
 from helpers import helper
 from django.utils.translation import gettext_lazy as _
 
-@api_view(http_method_names=["GET"])
-def get_all_config(request):
-    try:
-        res_data = {"baseLinks": variable_systems.BASE_LINK}
-        return response_data(data=res_data)
-    except Exception as ex:
-        helper.print_log_error(func_name="get_all_config", error=ex)
-        return response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data=None)
+class GetAllConfigView(ResponseCacheMixin, QueryCacheMixin, generics.GenericAPIView):
+    response_cache_timeout = 3600  # 1 hour for config (rarely changes)
 
-class SkillsListView(ListRequestMixin, generics.GenericAPIView):
+    def get(self, request, *args, **kwargs):
+        try:
+            res_data = {"baseLinks": variable_systems.BASE_LINK}
+            return response_data(data=res_data)
+        except Exception as ex:
+            helper.print_log_error(func_name="get_all_config", error=ex)
+            return response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data=None)
+
+class SkillsListView(ResponseCacheMixin, QueryCacheMixin, generics.GenericAPIView):
     queryset = Skills.objects.all().order_by('id')
     serializer_class = SkillsSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = SkillsFilter
     pagination_class = CustomPagination
-    page_size = 10 
+    page_size = 10
+    response_cache_timeout = 1800  # 30 minutes for skills (rarely change)
 
     def get(self, request, *args, **kwargs):
         return self.handle_list_request(request)
 
-class LinksListView(ListRequestMixin, generics.GenericAPIView):
+class LinksListView(ResponseCacheMixin, QueryCacheMixin, generics.GenericAPIView):
     queryset = Links.objects.all().order_by('id')
     serializer_class = LinksSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = LinksFilter
     pagination_class = CustomPagination
     page_size = 1
+    response_cache_timeout = 1800  # 30 minutes for links (rarely change)
 
     def get(self, request, *args, **kwargs):
         return self.handle_list_request(request)
 
-class LinksDetailView(generics.GenericAPIView):
+class LinksDetailView(ResponseCacheMixin, QueryCacheMixin, generics.GenericAPIView):
     queryset = Links.objects.all().order_by('id')
     serializer_class = LinksSerializer
+    response_cache_timeout = 1800  # 30 minutes for link details
 
     def get(self, request, id, *args, **kwargs):
         print(f"Lấy chi tiết link [{id}]")
