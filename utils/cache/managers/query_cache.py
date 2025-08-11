@@ -84,10 +84,8 @@ class QueryCacheManager:
         """
         base_key = QueryCacheManager.get_cache_key(model_name, filters, ordering)
         return VersionedCacheManager.get_versioned_data(base_key, model_name)
-    
-    # ================================
+
     # Legacy methods for backward compatibility
-    # ================================
     @staticmethod
     def cache_queryset(cache_key, queryset, timeout=300):
         """

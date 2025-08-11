@@ -1,7 +1,7 @@
 from rest_framework import pagination
 from rest_framework.response import Response
-from utils.cache.managers.pagination_cache import PaginationCacheManager
 from utils.cache.managers.versioned_cache import VersionedCacheManager
+from utils.cache.managers.pagination_cache import PaginationCacheManager
 
 class CustomPagination(pagination.PageNumberPagination):
     page_size = 12
