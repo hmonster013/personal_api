@@ -4,7 +4,7 @@ from . import views
 app_name = 'common'
 
 urlpatterns = [
-    path('all-configs', views.GetAllConfigView.as_view(), name='all-configs'),
+    path('all-configs', views.get_all_config, name='all-configs'),
 
     path('skills/list', views.SkillsListView.as_view(), name='skills-list'),
     path('links/list', views.LinksListView.as_view(), name='links-list'),

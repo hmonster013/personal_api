@@ -32,12 +32,32 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 
 APP_ENVIRONMENT = config('APP_ENV', default='development')
 
+# HTTPS/SSL Security Settings
+SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default=False, cast=bool)
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# HSTS (HTTP Strict Transport Security)
+SECURE_HSTS_SECONDS = config('SECURE_HSTS_SECONDS', default=0, cast=int)
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+
+# Secure Cookies
+SESSION_COOKIE_SECURE = config('SESSION_COOKIE_SECURE', default=False, cast=bool)
+CSRF_COOKIE_SECURE = config('CSRF_COOKIE_SECURE', default=False, cast=bool)
+
+# Additional Security Headers
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_REFERRER_POLICY = 'same-origin'
+X_FRAME_OPTIONS = 'DENY'
+
+# Allowed Hosts
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost').split(',')
 
+# CORS
 CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='https://localhost:4200').split(',')
-
 CORS_ALLOW_CREDENTIALS = True
-
+CORS_PREFLIGHT_MAX_AGE = 86400  # 24 hours cache preflight
 CORS_ALLOW_METHODS = [
     "GET",
     "POST",
@@ -46,12 +66,13 @@ CORS_ALLOW_METHODS = [
     "DELETE",
     "OPTIONS",
 ]
-
 CORS_ALLOW_HEADERS = [
     "accept",
-    "authorization",
+    "authorization", 
     "content-type",
     "x-requested-with",
+    "x-csrftoken",        # CSRF
+    "cache-control",      # caching
 ]
 
 # CKEDITOR
@@ -109,11 +130,13 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    
+
+    "sslserver",
     "ckeditor",
     "rest_framework",
     "django_filters",
-    'corsheaders',
+    "corsheaders",
+    "csp",
     
     "common",
     "info",
@@ -161,6 +184,7 @@ SESSION_CACHE_ALIAS = 'default'
 
 # Middleware configuration
 MIDDLEWARE = [
+    "csp.middleware.CSPMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
@@ -236,3 +260,14 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# CSP (Content Security Policy)
+CONTENT_SECURITY_POLICY = {
+    'DIRECTIVES': {
+        'default-src': ("'self'",),
+        'script-src': ("'self'", "'unsafe-inline'"),
+        'style-src': ("'self'", "'unsafe-inline'"),
+        'img-src': ("'self'", "data:", "https:"),
+        'connect-src': ("'self'", "http://localhost:4200", "https://localhost:4200"),
+    }
+}

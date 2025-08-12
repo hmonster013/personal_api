@@ -11,6 +11,14 @@ venv/
 .env
 .env.production
 
+# Ignore private keys
+*.key
+*.pem
+
+# Keep certificates (public)
+!*.crt
+!*.cert
+
 # Database files
 data/postgres_data
 

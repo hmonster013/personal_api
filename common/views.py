@@ -1,6 +1,8 @@
 # common/views.py
 from rest_framework import generics, status
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.decorators import api_view
+
 from configs import variable_systems
 from configs.paginations import CustomPagination
 from configs.variable_response import response_data
@@ -11,17 +13,18 @@ from .serializers import SkillsSerializer, LinksSerializer, ContactCreateSeriali
 from .filters import SkillsFilter, LinksFilter
 from helpers import helper
 from django.utils.translation import gettext_lazy as _
+from django.views.decorators.csrf import csrf_exempt
 
-class GetAllConfigView(ResponseCacheMixin, QueryCacheMixin, generics.GenericAPIView):
-    response_cache_timeout = 3600  # 1 hour for config (rarely changes)
-
-    def get(self, request, *args, **kwargs):
-        try:
-            res_data = {"baseLinks": variable_systems.BASE_LINK}
-            return response_data(data=res_data)
-        except Exception as ex:
-            helper.print_log_error(func_name="get_all_config", error=ex)
-            return response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data=None)
+@api_view(["GET"])
+@csrf_exempt
+def get_all_config(request):
+    """Get all system configurations"""
+    try:
+        res_data = {"baseLinks": variable_systems.BASE_LINK}
+        return response_data(data=res_data)
+    except Exception as ex:
+        helper.print_log_error(func_name="get_all_config", error=ex)
+        return response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data=None)
 
 class SkillsListView(ResponseCacheMixin, QueryCacheMixin, generics.GenericAPIView):
     queryset = Skills.objects.all().order_by('id')
