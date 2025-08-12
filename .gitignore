@@ -16,7 +16,7 @@ venv/
 *.pem
 
 # Keep certificates (public)
-!*.crt
+*.crt
 !*.cert
 
 # Database files
