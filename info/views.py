@@ -1,6 +1,7 @@
 # info/views.py
 from rest_framework import generics, status
 from django_filters.rest_framework import DjangoFilterBackend
+from django.db.models import Q
 
 from configs.paginations import CustomPagination
 from configs.variable_response import response_data
@@ -43,6 +44,44 @@ class BlogsDetailView(ResponseCacheMixin, generics.GenericAPIView):
                 message=_("Blog ID [{id}] không hợp lệ").format(id=id),
                 status=status.HTTP_404_NOT_FOUND
             )
+
+class BlogsSearchView(ResponseCacheMixin, QueryCacheMixin, generics.GenericAPIView):
+    """
+    API tìm kiếm blog theo keyword và skills
+
+    Parameters:
+    - kw: Keyword để tìm kiếm trong title, content, description
+    - skills: Tên các skill cách nhau bởi dấu phẩy (VD: "Python,Django,React")
+    - skill_ids: ID các skill cách nhau bởi dấu phẩy (VD: "1,2,3")
+    - page: Số trang (mặc định: 1)
+    - page_size: Số item mỗi trang (mặc định: 10)
+    """
+    queryset = Blogs.objects.filter(status=True).order_by('-created_at')
+    serializer_class = BlogsSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = BlogsFilter
+    pagination_class = CustomPagination
+    page_size = 10
+    cache_timeout = 300  # 5 minutes for search results
+    response_cache_timeout = 300  # 5 minutes for search results
+
+    def get(self, request, *args, **kwargs):
+        """Xử lý tìm kiếm blog"""
+        print(f"Tìm kiếm blog với params: {request.query_params}")
+
+        # Lấy parameters
+        keyword = request.query_params.get('kw', '').strip()
+        skills = request.query_params.get('skills', '').strip()
+        skill_ids = request.query_params.get('skill_ids', '').strip()
+
+        # Nếu không có tham số tìm kiếm nào, trả về tất cả blog đã publish
+        if not any([keyword, skills, skill_ids]):
+            print("Không có tham số tìm kiếm, trả về tất cả blog")
+            return self.handle_list_request(request)
+
+        # Áp dụng filter và trả về kết quả
+        print(f"Thực hiện tìm kiếm với: keyword='{keyword}', skills='{skills}', skill_ids='{skill_ids}'")
+        return self.handle_list_request(request)
 
 class ExperiencesListView(ResponseCacheMixin, QueryCacheMixin, generics.GenericAPIView):
     queryset = Experiences.objects.all().order_by('id')
