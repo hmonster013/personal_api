@@ -30,25 +30,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
 
-      - name: Create .env for tests (from GitHub Secrets)
-        run: |
-          {
-            echo "SECRET_KEY=${{ secrets.SECRET_KEY }}"
-            echo "DEBUG=false"
-            echo "ALLOWED_HOSTS=localhost,127.0.0.1"
-            echo "CSRF_TRUSTED_ORIGINS=http://localhost:8000"
-            echo "CORS_ALLOWED_ORIGINS=http://localhost:4200"
-            echo "SECURE_SSL_REDIRECT=false"
-            echo "SECURE_HSTS_SECONDS=0"
-            echo "SESSION_COOKIE_SECURE=false"
-            echo "CSRF_COOKIE_SECURE=false"
-            echo "DATABASE_URL=${{ secrets.DATABASE_URL }}"
-            echo "REDIS_URL=${{ secrets.REDIS_URL }}"
-            echo "CLOUDINARY_CLOUD_NAME=${{ secrets.CLOUDINARY_CLOUD_NAME }}"
-            echo "CLOUDINARY_API_KEY=${{ secrets.CLOUDINARY_API_KEY }}"
-            echo "CLOUDINARY_API_SECRET=${{ secrets.CLOUDINARY_API_SECRET }}"
-          } >> .env
-
       - name: Install deps
         run: pip install -r requirements.txt
 
