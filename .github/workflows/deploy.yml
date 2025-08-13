@@ -33,20 +33,20 @@ jobs:
       - name: Create .env for tests (from GitHub Secrets)
         run: |
           {
-            echo "SECRET_KEY=${{ secrets.SECRET_KEY }}"
-            echo "DEBUG=false"
-            echo "ALLOWED_HOSTS=localhost,127.0.0.1"
-            echo "CSRF_TRUSTED_ORIGINS=http://localhost:8000"
-            echo "CORS_ALLOWED_ORIGINS=http://localhost:4200"
-            echo "SECURE_SSL_REDIRECT=false"
-            echo "SECURE_HSTS_SECONDS=0"
-            echo "SESSION_COOKIE_SECURE=false"
-            echo "CSRF_COOKIE_SECURE=false"
-            echo "DATABASE_URL=${{ secrets.DATABASE_URL }}"
-            echo "REDIS_URL=${{ secrets.REDIS_URL }}"
-            echo "CLOUDINARY_CLOUD_NAME=${{ secrets.CLOUDINARY_CLOUD_NAME }}"
+            echo "ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }}"
+            echo "APP_ENV=${{ secrets.APP_ENV }}"
             echo "CLOUDINARY_API_KEY=${{ secrets.CLOUDINARY_API_KEY }}"
             echo "CLOUDINARY_API_SECRET=${{ secrets.CLOUDINARY_API_SECRET }}"
+            echo "CLOUDINARY_CLOUD_NAME=${{ secrets.CLOUDINARY_CLOUD_NAME }}"
+            echo "CORS_ALLOWED_ORIGINS=${{ secrets.CORS_ALLOWED_ORIGINS }}"
+            echo "CSRF_COOKIE_SECURE=${{ secrets.CSRF_COOKIE_SECURE }}"
+            echo "DATABASE_URL=${{ secrets.DATABASE_URL }}"
+            echo "DEBUG=${{ secrets.DEBUG }}"
+            echo "SECRET_KEY=${{ secrets.SECRET_KEY }}"
+            echo "SECURE_HSTS_SECONDS=${{ secrets.SECURE_HSTS_SECONDS }}"
+            echo "SECURE_SSL_REDIRECT=${{ secrets.SECURE_SSL_REDIRECT }}"
+            echo "SESSION_COOKIE_SECURE=${{ secrets.SESSION_COOKIE_SECURE }}"
+            echo "USE_HTTPS=${{ secrets.USE_HTTPS }}"
           } >> .env
 
       - name: Install deps
