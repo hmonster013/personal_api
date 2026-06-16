@@ -1,7 +1,7 @@
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 
-from info.models import Blogs, Projects
+from info.models import Blogs, Projects, Experiences
 from utils.cache.managers.versioned_cache import VersionedCacheManager
 
 @receiver([post_save, post_delete], sender=Blogs)
@@ -52,6 +52,7 @@ def invalidate_projects_cache(sender, instance, created=None, **kwargs):
     # VersionedCacheManager.increment_version("files")
     VersionedCacheManager.increment_version("skills")
 
+@receiver([post_save, post_delete], sender=Experiences)
 def invalidate_experiences_cache(sender, instance, created=None, **kwargs):
     """
     Invalidate cache for experiences
